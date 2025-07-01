@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f2f2f2, #e6e6e6);
+      color: #333;
+    }
+    /* Header styles matching the article page */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #959798;
+      padding: 15px 20px;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo-left,
+    .logo-right {
+      width: 140px;
+      height: 140px;
+    }
+    .logo-left img,
+    .logo-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    header h1 {
+      font-size: 2rem;
+      text-align: center;
+      flex-grow: 1;
+    }
+    /* Instruction container */
+    .instructions-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .instructions-container h2 {
+      margin-bottom: 20px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #0e0e0f;
+    }
+    .instructions-container p {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    .cta-section {
+      margin-top: 30px;
+      text-align: center;
+    }
+    /* Reward Box Styling */
+    .reward-box {
+      border: 1px solid #959798;
+      background-color: #f0f8ff;
+      padding: 15px;
+      margin: 20px auto;
+      border-radius: 5px;
+      text-align: center;
+      max-width: 400px;
+    }
+    .reward-box p {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    #copy-code-button {
+      background-color: #959798;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #copy-code-button:hover {
+      background-color: #0056b3;
+    }
+    /* Button styling */
+    .return-button {
+      background-color: #959798;
+      margin: 20px auto 0;
+      text-align: center;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .return-button:hover {
+      background-color: #0056b3;
+    }
+    @media (max-width: 600px) {
+       .logo-right {
+         display: none;
+       }
+    }
+  </style>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <header>
+    <div class="logo-left">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Left">
+    </div>
+    <h1>Thank You!</h1>
+    <div class="logo-right">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo Right">
+    </div>
+  </header>
+
+  <div class="instructions-container">
+    <h2>We Appreciate Your Participation</h2>
+    <br>
+    <p>
+      <strong>Your responses have been <u>successfully recorded</u> and will be <u>processed anonymously</u>.</strong>
+    </p>
+
+    <br>
+
+    <h2>How will your data be used?</h2>
+    <br>
+    <p>This user study is part of a larger research project aimed at exploring how news content can be
+       adapted to better suit different user groups. In this study, we use OpenAI’s ChatGPT-4 to generate
+       satirical summaries of real-world news articles. By having users evaluate these summaries, we seek
+       to gain insights into consumer perceptions of the model’s ability to create engaging and funny
+       satire. We also investigate whether receiving certain news categories in a more entertaining
+       format still provides an effective way to distribute information, and assess the model’s ability to preserve
+       the factual integrity of the original articles while altering the original tone.</p>
+
+       <br>
+
+       <p>Our end goal with this research is to discover ways to make more "hard" news— which some people tend to avoid
+         but still contain critical societal information— more digestible and appealing.</p>
+
+       <br>
+
+<div class="cta-section">
+  <a href="https://app.prolific.com/submissions/complete?cc=CCXLX26I" class="return-button">Return to Prolific</a>
+</div>
+</div>
+</body>
+</html>
+

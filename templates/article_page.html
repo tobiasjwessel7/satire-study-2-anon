@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article {{ page + 1 }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Include the ProgressBar.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/progressbar.js/1.0.1/progressbar.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .content-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .bias-bar-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+
+    .bias-bar-container div {
+      text-align: center;
+      flex: 1;
+    }
+    
+    .article-container {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .article-version {
+      border: 1px solid black;
+      padding: 20px;
+      flex: 1;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .article-version:hover {
+      background-color: #f5f5f5;
+    }
+
+    button[type="submit"] {
+      background-color: #959798;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    /* Info Circle */
+    .info-circle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: #959798;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 1100;
+    }
+
+    .info-box {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      background-color: #959798;
+      color: #eee;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+    }
+
+    .info-box p {
+      margin-bottom: 10px;
+    }
+
+    .close-info {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .close-info:hover {
+      background-color: #2d00b3;
+    }
+
+    /* Fixed graphic element showing the article's category */
+    #article-category {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      z-index: 1000;
+    }
+
+    /* Media Query for small screens: add extra bottom spacing to allow scroll past the fixed category element */
+    @media screen and (max-width: 480px) {
+      .content-container {
+      /* This extra bottom padding prevents the submit button from being hidden behind the fixed element */
+      padding-bottom: 100px;
+      }
+      .article-container {
+      flex-wrap: wrap;
+      }
+      .article-version {
+      flex: none;
+      width: 48%;
+      padding: 10px;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      /* 1) stack the two versions ↓ */
+      .article-container {
+      flex-direction: column;        
+      gap: 24px;                    
+      }
+
+      
+      .article-version {
+      width: 100%;
+      position: relative;
+      }
+
+      
+     
+      .article-version::before {
+      content: attr(data-version);      
+      display: flex;                    
+      align-items: center;
+      justify-content: center;          
+      gap: 8px;                        
+      font-weight: bold;
+      margin-bottom: 8px;
+      padding: 4px 0;
+      border-top: 2px solid #000;       /* duplicate black lines     */
+      border-bottom: 2px solid #000;
+      }
+
+      
+      .bias-bar-container {
+      display: none;
+  }
+  .article-version::after {
+    content: '\25EF';         /* ◯  hollow circle – “unchecked”   */
+    font-size: 1rem;
+    margin-left: 6px;
+  }
+  
+  .article-version.selected::after {
+    content: '\25C9';        
+  }
+     
+      
+    }
+  </style>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #959798; color: white; width: 100%;">
+    <!-- Logo -->
+    <div style="display: flex; align-items: center;">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 80px; margin-right: 10px;">
+      <h1>Article {{ page + 1 }}</h1>
+    </div>
+    <!-- Progress Indicator using ProgressBar.js -->
+    <div id="progress-bar" class="progress-circle" style="width: 70px; height: 70px;"></div>
+  </header>
+
+  <div class="content-container">
+    <!-- Article Image -->
+    <div class="image-container">
+      <img src="{{ versions[0]['image_url'] }}" alt="Article Image">
+    </div>
+
+    <!-- Preference Bar with Clickable Choices -->
+    <form id="article-form" method="post" onsubmit="return validateSelection();">
+      <div class="bias-bar-container">
+        {% for version in versions %}
+        <div>
+          <!-- Label above each version -->
+          <label for="version{{ loop.index0 }}" style="font-weight: bold;">Version {{ loop.index }}</label>
+          <br>
+          <!-- Single set of radio buttons inside form -->
+          <input type="radio" id="version{{ loop.index0 }}" name="preference" value="{{ version['id'] }}">
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Article Versions -->
+      <div class="article-container">
+        {% for version in versions %}
+        <div class="article-version" data-version="Version {{ loop.index }}" onclick="selectVersion('{{ loop.index0 }}')">
+          <h2>{{ version['title'] }}</h2>
+          <p>{{ version['content'] }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <!-- Fixed graphic element showing the article's category -->
+  <div id="article-category">
+    <p>Current category:&nbsp;<strong>{{ category }}</strong></p>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <!-- Info Circle and Info Box -->
+  <div class="info-circle" id="info-circle">?</div>
+  <div class="info-box" id="info-box">
+    <p>
+       In this part of the study, we ask you to read through the two presented version of the same article summary, and then choose your preferred version out of the two.
+    </p>
+    <p>
+       Please answer as honestly as possible, there are no right or wrong answers.
+    </p>
+    <button class="close-info" id="close-info">Close</button>
+  </div>
+
+  <!-- New Progress Bar Script -->
+  <script>
+    // Retrieve current page and total pages from template variables
+    const currentPage = "{{ page + 1 }}";
+    const totalPages = "{{ total_pages }}";
+    const progressValue = currentPage / totalPages;
+
+    // Create the circular progress bar with ProgressBar.js
+    const progressBar = new ProgressBar.Circle('#progress-bar', {
+      color: '#FF5722',
+      strokeWidth: 6,
+      trailWidth: 2,
+      easing: 'easeInOut',
+      duration: 1400,
+      from: { color: '#FF5722', width: 6 },
+      to: { color: '#FF5722', width: 6 },
+      step: function (state, circle) {
+        circle.path.setAttribute('stroke', state.color);
+        // Compute the current page number from the animated value and display as fraction
+        const value = Math.round(circle.value() * totalPages);
+        circle.setText(value + '/' + totalPages);
+      }
+    });
+
+    // Animate the progress circle to the correct value
+    progressBar.animate(progressValue);
+  </script>
+</body>
+</html>

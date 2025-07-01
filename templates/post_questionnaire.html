@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Article Evaluation - Article {{ page + 1 }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Include ProgressBar.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/progressbar.js/1.0.1/progressbar.min.js"></script>
+  <style>
+    /* Header & Container (same as article page) */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background-color: #959798;
+      color: white;
+      width: 100%;
+    }
+    header h1 {
+      flex: 1;
+      text-align: center;
+      font-size: 2rem;
+      margin: 0;
+    }
+    .content-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center;
+      box-sizing: border-box;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    /* Evaluation container for displaying article versions */
+    .evaluate-container {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+
+    @media (max-width: 768px) {
+      .evaluate-container {
+        flex-direction: column;   /* stack      */
+        justify-content: flex-start; /* <-- let them flow naturally */
+        gap: 0;                   /* optional: use margin instead   */
+      }
+
+      .evaluate-container .article-version {
+        width: 100%;              /* fill full width                */
+        margin-bottom: 20px;      /* spacing between stacked cards  */
+      }
+    }
+    .article-version {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      cursor: default;
+      border: 3px solid transparent;
+      border-radius: 8px;
+    }
+    /* Borders to highlight chosen / unchosen */
+    .chosen {
+      border-color: green;
+    }
+    .not-chosen {
+      border-color: red;
+    }
+    /* Evaluation text */
+    .evaluation-text {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    /* Article version container styling */
+    .article-version {
+      position: relative; /* allow absolutely positioned children */
+    }
+
+    /* Version label styling */
+    .version-label {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      font-size: 0.85rem;
+      color: #ccc; /* light grey */
+      pointer-events: none; /* so it doesn’t interfere with any clicks */
+    }
+
+      
+    /* Likert container for evaluation questions */
+    .likert-container {
+      max-width: 500px;
+      margin: 0 auto 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .likert-container h2 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #0a0a0a;
+    }
+    .likert-question {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .likert-question p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .likert-options {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .likert-container hr.separator {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 30px 0 20px;
+    }
+    .likert-options label {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .likert-options input[type="radio"] {
+      position:absolute;
+      opacity:0;        /* invisible but focusable */
+      width:30px;
+      height:30px;
+      margin:0;  
+    }
+
+    .likert-options span {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 50%;
+      border: 2px solid #007BFF;
+      text-align: center;
+      margin: 0 5px;
+    }
+    .likert-options input[type="radio"]:checked + span {
+      background-color: #007BFF;
+      color: white;
+    }
+    button[type="submit"] {
+      padding: 10px 20px;
+      background-color: #64707d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: block;
+      margin: 0 auto;
+    }
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+    /* Progress Circle (if reused from the article page) */
+    .progress-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: conic-gradient(#d3d3d3 0deg, #d3d3d3 360deg);
+    }
+    .progress-text {
+      position: absolute;
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+    }
+    /* Info Circle and Info Box (from the article page) */
+    .info-circle {
+      pointer-events: auto;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: #959798;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 1100;
+    }
+    .info-box {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      background-color: #959798;
+      color: #eee;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+    }
+    .info-box p {
+      margin-bottom: 10px;
+    }
+    .close-info {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .close-info:hover {
+      background-color: #2d00b3;
+    }
+
+    u.coloured-underline {
+      text-decoration-color: green; /* Custom underline color */
+      text-decoration-thickness: 2px; 
+      text-underline-offset: 2px;     
+    }
+
+    @media (max-width:768px){
+      .desktop-only{display:none;}   /* hide the words on phones */
+    }
+
+  </style>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <!-- Header with progress bar -->
+  <header>
+    <div style="display: flex; align-items: center;">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 80px; margin-right: 10px;">
+      <h1>
+        <span class="desktop-only">Evaluation of </span>
+        Article {{ page + 1 }}
+        <span class="desktop-only"> Choice</span>
+      </h1>
+      
+    </div>
+    <div id="progress-bar" class="progress-circle" style="width: 70px; height: 70px;"></div>
+  </header>
+
+  <!-- Main Content Container -->
+  <div class="content-container">
+    <!-- Begin Form for Evaluation Submission -->
+    <form method="POST">
+      <!-- Evaluation Container: Display the two article versions side by side -->
+      <div class="evaluate-container">
+        {% for version in versions %}
+        <div class="article-version {% if version.id == chosen_version %}chosen{% else %}not-chosen{% endif %}">
+          <h2>{{ version.title }}</h2>
+          <p>{{ version.content }}</p>
+          <span class="version-label">
+            {{ version.id|capitalize }} version
+          </span>          
+          <span class="version-label">{{ version.id|capitalize }} version</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Display which version was chosen -->
+      <div class="evaluation-text">
+        You chose the <u class="coloured-underline"><strong>{{ chosen_version }} version</strong></u> of this article.
+      </div>
+
+      <!-- Likert Evaluation Container -->
+      <div class="likert-container">
+        <h2>Why do you think you chose this version?</h2>
+        <h2>Please rate your agreement with the following statements on a scale from 1 to 7:</h2>
+        <p> 1 = Strongly Disagree | 4 = Neither Agree nor Disagree | 7 = Strongly Agree </p>
+
+        {% if idx == attention_idx %}
+        <div class="likert-question">
+          <p><strong>Attention Check:</strong> Please select <strong>3</strong> for this question.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="attention_check" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <hr class="separator">
+        {% endif %}
+
+        <!-- Pre-Category Questions -->
+        <div class="likert-question">
+          <p>The article summary I chose seemed more factually accurate.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="factual_accuracy" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div class="likert-question">
+          <p>I found the article summary I chose to be more humorous.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="humor_appreciation" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div class="likert-question">
+          <p>I found the article summary I chose more entertaining.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="entertainment" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div class="likert-question">
+          <p>The article summary I chose was easier to understand.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="comprehension" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Category Header -->
+
+        <hr class="separator">
+
+        <h2>This article is from the category <strong><u>{{ category }}</u></strong>. <br> <br> Regardless of your choice, select your perceived agreement with the following statements:</h2>
+
+        <p> 1 = Strongly Disagree | 4 = Neither Agree nor Disagree | 7 = Strongly Agree </p>
+        
+        <!-- Post-Category Questions -->
+        <div class="likert-question">
+          <p>The satirical article summary made this topic feel less heavy or overwhelming.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="less_heavy" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Two Additional Placeholder Questions -->
+        <div class="likert-question">
+          <p>I would like to read about this topic in a satirical format in the future.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="future_satire" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="likert-question">
+            <p>The satirical version of this article summary increased my interest in the topic.</p>
+            <div class="likert-options">
+              {% for i in range(1, 8) %}
+              <label>
+                <input type="radio" name="interest_increase" value="{{ i }}" required>
+                <span>{{ i }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div class="likert-question">
+          <p>The satirical version of this article summary had a positive impact on my mood.</p>
+          <div class="likert-options">
+            {% for i in range(1, 8) %}
+            <label>
+              <input type="radio" name="mood_impact" value="{{ i }}" required>
+              <span>{{ i }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit">Submit Evaluation</button>
+    </form>
+    <!-- End Form -->
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <!-- Info Circle and Info Box (same as in article page) -->
+  <div class="info-circle" id="info-circle">?</div>
+  <div class="info-box" id="info-box">
+    <p>
+      In this part of the study, we show you the two article versions you originally chose between, 
+      followed by a few questions to understand why you made that choice and how the satirical version influenced your view of the topic.
+    </p>
+    <p>
+       Please answer as honestly as possible; there are no right or wrong answers.
+    </p>
+    <button class="close-info" id="close-info">Close</button>
+  </div>
+
+  <!-- Scripts: Progress bar and external script -->
+  <script>
+    // Retrieve current page and total pages from template variables
+    const currentPage = {{ page + 1 }};
+    const totalPages = {{ total_pages }};
+    const progressValue = currentPage / totalPages;
+
+    // Create the circular progress bar with ProgressBar.js
+    const progressBar = new ProgressBar.Circle('#progress-bar', {
+      color: '#FF5722',
+      strokeWidth: 6,
+      trailWidth: 2,
+      easing: 'easeInOut',
+      duration: 1400,
+      from: { color: '#FF5722', width: 6 },
+      to: { color: '#FF5722', width: 6 },
+      step: function (state, circle) {
+        circle.path.setAttribute('stroke', state.color);
+        // Compute the current page number from the animated value and display as fraction
+        const value = Math.round(circle.value() * totalPages);
+        circle.setText(value + '/' + totalPages);
+      }
+    });
+
+    // Animate the progress circle to the correct value
+    progressBar.animate(progressValue);
+
+
+    (function () {
+      const form = document.querySelector('form'); // Select the form
+      const questions = Array.from(
+      form.querySelectorAll('.likert-question')
+      ); // Select all likert-question blocks
+
+      // Add optional red highlight for unanswered items
+      const CSS =
+      '.likert-question.missing { outline: 2px solid red; outline-offset: 4px; }';
+      document.head.insertAdjacentHTML('beforeend', `<style>${CSS}</style>`);
+
+      form.addEventListener('submit', function (e) {
+      let allFilled = true;
+
+      questions.forEach((question) => {
+        const answered = question.querySelector(
+        'input[type="radio"]:checked'
+        );
+        question.classList.toggle('missing', !answered);
+        if (!answered) allFilled = false;
+      });
+
+      if (!allFilled) {
+        e.preventDefault(); // Prevent form submission
+        alert('Please answer every question before you proceed.');
+      }
+      });
+    })();
+  </script>
+</body>
+</html>
+

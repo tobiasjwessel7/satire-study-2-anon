@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post-Question</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f2f2f2;
+      color: #333;
+      line-height: 1.6;
+    }
+    /* Header styles */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #959798;
+      padding: 15px 20px;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+    header h1 {
+      font-size: 2rem;
+      text-align: center;
+      flex-grow: 1;
+    }
+    /* Left and Right logo containers */
+    .logo-left img,
+    .logo-right img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+    /* Container styles */
+    .instructions-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .instructions-container h2 {
+      margin-bottom: 20px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #0c0c0c;
+    }
+    .instructions-container p {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    /* Clickable options styled like evaluation Likert */
+    .clickable-options {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 10px;
+    }
+    .clickable-options label {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .clickable-options input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 30px;
+      height: 30px;
+      margin: 0;
+    }
+    .clickable-options span {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 50%;
+      border: 2px solid #007BFF;
+      text-align: center;
+      margin: 0 5px;
+    }
+    .clickable-options input[type="radio"]:checked + span {
+      background-color: #007BFF;
+      color: white;
+    }
+    .proceed-button {
+      background-color: #959798;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    /* Mobile Styles */
+    @media (max-width: 600px) {
+      .logo-right {
+        display: none;
+      }
+      .clickable-options {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin: 20px 10px;
+      }
+      .clickable-options label {
+        text-align: center;
+        padding: 5px 0;
+      }
+    }
+  </style>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <header>
+    <div class="logo-left">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Left">
+    </div>
+    <h1>AI Question</h1>
+    <div class="logo-right">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo Right">
+    </div>
+  </header>
+
+  <div class="instructions-container">
+    <p><strong>Please select an option below to indicate to what extent you agree with the following statement:</strong> <br> <br> I generally find generative AI (such as chatGPT) to be trustworthy.</p>
+    <form id="postQuestionForm" action="#" method="post">
+
+        <p style="text-align: center;">
+            1 = Strongly Disagree | 4 = Neither Agree nor Disagree | 7 = Strongly Agree
+          </p>
+
+      <div class="clickable-options">
+        <label>
+          <input type="radio" name="AI_trust" value="1" required>
+          <span>1</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="2" required>
+          <span>2</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="3" required>
+          <span>3</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="4" required>
+          <span>4</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="5" required>
+          <span>5</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="6" required>
+          <span>6</span>
+        </label>
+        <label>
+          <input type="radio" name="AI_trust" value="7" required>
+          <span>7</span>
+        </label>
+      </div>
+      <button type="submit" class="proceed-button">Proceed</button>
+    </form>
+  </div>
+</body>
+</html>

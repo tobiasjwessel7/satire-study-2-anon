@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pre-Questionnaire</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Global Reset & Body Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      color: #333;
+    }
+
+    /* Header styled like other pages */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #959798;
+      color: white;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      flex: 1;
+      text-align: center;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    /* Left and Right logo containers */
+    .logo-left img,
+    .logo-right img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+
+    /* Main container for the questionnaire */
+    .container {
+      margin: auto;
+      padding: 20px;
+      max-width: 600px;
+    }
+
+    .header-text {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header-text h1 {
+      font-size: 2rem;
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+       .logo-right {
+         display: none;
+       }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .form-group select,
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .form-group input[type="radio"] {
+      margin-right: 10px;
+    }
+    .submit-button {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .submit-button button {
+      background-color: #64707d;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .submit-button button:hover {
+      background-color: #0056b3;
+    }
+    /* Conditional question container initially hidden */
+    .conditional-question {
+      margin-top: 10px;
+      display: none;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    /* Styling for the conditional question title (now not bold) */
+    .conditional-question-title {
+      font-size: 1.1rem;
+      font-weight: normal;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    /* Each radio option styled as a block */
+    .conditional-option {
+      margin-bottom: 8px;
+    }
+  </style>
+  <script>
+    function handleNewsFrequencyChange(value) {
+      const consumeNews = document.getElementById("consume-news");
+      const neverConsumeNews = document.getElementById("never-consume-news");
+      
+      if (value === "never" || value === "less_once_week") {
+        consumeNews.style.display = "none";
+        neverConsumeNews.style.display = "block";
+      } else if (value !== "") {
+        consumeNews.style.display = "block";
+        neverConsumeNews.style.display = "none";
+      } else {
+        consumeNews.style.display = "none";
+        neverConsumeNews.style.display = "none";
+      }
+    }
+  </script>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <!-- Header with two logos and centered title -->
+  <header>
+    <div class="logo-left">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo 1">
+    </div>
+    <h1>Pre-Questionnaire</h1>
+    <div class="logo-right">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo 2">
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="header-text">
+      <p>Please answer the following questions to the best of your ability.</p>
+    </div>
+    <form action="/pre-questionnaire" method="POST">
+      <!-- Q1: Where do you currently live? -->
+      <div class="form-group">
+        <label for="state">Where do you currently live?</label>
+        <select id="state" name="state" required>
+          <option value="">Select your state</option>
+          {% for state in us_states %}
+            <option value="{{ state }}">{{ state }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <!-- Q2: Age -->
+      <div class="form-group">
+        <label for="age">What is your age?</label>
+        <input type="number" id="age" name="age" min="0" max="100" required>
+      </div>
+      <!-- Q3: Gender -->
+      <div class="form-group">
+        <label>What is your gender?</label>
+        <label><input type="radio" name="gender" value="male" required> Male</label>
+        <label><input type="radio" name="gender" value="female"> Female</label>
+        <label><input type="radio" name="gender" value="non-binary"> Non-binary</label>
+        <label><input type="radio" name="gender" value="prefer_not_to_say"> Prefer not to say</label>
+      </div>
+      <!-- Q4: Occupation -->
+      <div class="form-group">
+        <label>What's your current occupation?</label>
+        <label><input type="radio" name="occupation" value="student" required> Student</label>
+        <label><input type="radio" name="occupation" value="unemployed"> Unemployed</label>
+        <label><input type="radio" name="occupation" value="full_time"> Full-time Employee</label>
+        <label><input type="radio" name="occupation" value="part_time"> Part-time Employee</label>
+        <label><input type="radio" name="occupation" value="freelance"> Freelance</label>
+        <label><input type="radio" name="occupation" value="retired"> Retired</label>
+        <label><input type="radio" name="occupation" value="other"> Other</label>
+      </div>
+      <!-- Q5: Education -->
+      <div class="form-group">
+        <label>What's your current highest level of education?</label>
+        <label><input type="radio" name="education" value="none" required> No formal education</label>
+        <label><input type="radio" name="education" value="elementary"> Elementary school</label>
+        <label><input type="radio" name="education" value="high_school"> High school</label>
+        <label><input type="radio" name="education" value="associates"> Associate's degree</label>
+        <label><input type="radio" name="education" value="bachelors"> Bachelor's degree</label>
+        <label><input type="radio" name="education" value="masters"> Master's degree</label>
+        <label><input type="radio" name="education" value="doctoral"> Doctoral degree</label>
+      </div>
+      <!-- Q6: Political Party -->
+      <div class="form-group">
+        <label>Which political party do you most identify with?</label>
+        <label><input type="radio" name="political_party" value="democratic" required> Democratic Party</label>
+        <label><input type="radio" name="political_party" value="republican"> Republican Party</label>
+        <label><input type="radio" name="political_party" value="independent"> Independent</label>
+        <label><input type="radio" name="political_party" value="other"> Other</label>
+      </div>
+      <!-- Q7: News Frequency -->
+      <div class="form-group">
+        <label>How frequently would you say you consume news?</label>
+        <select name="news_frequency" onchange="handleNewsFrequencyChange(this.value)" required>
+          <option value="">Select</option>
+          <option value="several_times_day">Several times a day</option>
+          <option value="once_day">Once a day</option>
+          <option value="few_times_week">A few times a week</option>
+          <option value="once_week">Once a week</option>
+          <option value="less_once_week">Less than once a week</option>
+          <option value="never">Never</option>
+        </select>
+      </div>
+      <!-- Conditional Q7a: For news consumers -->
+      <div id="consume-news" class="conditional-question">
+        <p class="conditional-question-title">What is your primary reason for consuming news?</p>
+        <div class="conditional-option">
+          <input type="radio" id="news_reason_stay_informed" name="news_reason" value="stay_informed">
+          <label for="news_reason_stay_informed">To stay informed</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="news_reason_entertainment" name="news_reason" value="entertainment">
+          <label for="news_reason_entertainment">Entertainment</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="news_reason_school_work" name="news_reason" value="school_work">
+          <label for="news_reason_school_work">For school/work</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="news_reason_engage_discussions" name="news_reason" value="engage_discussions">
+          <label for="news_reason_engage_discussions">To engage in discussions</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="news_reason_other" name="news_reason" value="other">
+          <label for="news_reason_other">Other</label>
+        </div>
+      </div>
+      <!-- Conditional Q7b: For those who never or rarely consume news -->
+      <div id="never-consume-news" class="conditional-question">
+        <p class="conditional-question-title">What is the primary reason you choose not to consume news?</p>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_negative" name="no_news_reason" value="negative_stressful">
+          <label for="no_news_reason_negative">I find news too negative or stressful</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_trust" name="no_news_reason" value="dont_trust_media">
+          <label for="no_news_reason_trust">I don’t trust the news or media</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_no_time" name="no_news_reason" value="no_time">
+          <label for="no_news_reason_no_time">I don’t have time to follow the news</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_irrelevant" name="no_news_reason" value="irrelevant">
+          <label for="no_news_reason_irrelevant">The news doesn't feel relevant to me</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_boring" name="no_news_reason" value="boring_uninteresting">
+          <label for="no_news_reason_boring">I find the news boring or uninteresting</label>
+        </div>
+        <div class="conditional-option">
+          <input type="radio" id="no_news_reason_other" name="no_news_reason" value="other">
+          <label for="no_news_reason_other">Other</label>
+        </div>
+      </div>
+      <div class="submit-button">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
+
+

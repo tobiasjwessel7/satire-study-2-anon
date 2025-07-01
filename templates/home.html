@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome!</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Basic Reset & Body */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      color: #333;
+    }
+
+    /* Header with two logos and a centered title */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #959798; /* Grey color */
+      padding: 20px;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Centered heading */
+    header h1 {
+      flex: 1;
+      text-align: center;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+       .logo-right {
+         display: none;
+       }
+    }
+
+    /* Left and Right logo containers */
+    .logo-left img,
+    .logo-right img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Intro Section */
+    .intro-section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .intro-section p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    /* Instructions Section */
+    .instructions-section {
+      margin-top: 30px;
+    }
+    .instructions-section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .instructions-section ul {
+      margin: 20px 0;
+      padding-left: 20px;
+      color: #555;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .instructions-section ul li {
+      margin-bottom: 10px;
+    }
+
+    /* CTA (Call To Action) */
+    .cta-section {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .cta-section h2 {
+      font-size: 1.3rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: #64707d;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #0056b3;
+    }
+    
+    /* Consent Note */
+    .consent-note {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #ccc;
+      font-size: 0.8rem;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<meta name="theme-color" content="#959798">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<body>
+  <header>
+    <!-- Left Logo -->
+    <div class="logo-left">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo 1">
+    </div>
+    <!-- Centered Title -->
+    <h1>Welcome!</h1>
+    <!-- Right Logo -->
+    <div class="logo-right">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo 2">
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Intro Section -->
+    <div class="intro-section">
+      <h2>What is this study about?</h2>
+      <p>
+        This study explores how changing the presentation of news article summaries can affect the reader’s experience.
+        During the study, you will select your preference from a total of nine different categories. After making your selection,
+        you will be asked to read two versions of five different news article summaries and then choose your preferred version.
+      </p>
+
+      <!-- Instructions Section -->
+      <div class="instructions-section">
+        <h2>What do you need to do?</h2>
+        <ul>
+          <li>
+            <strong>Step 1:</strong> Complete a short questionnaire about yourself (e.g., age, news habits).
+          </li>
+          <li>
+            <strong>Step 2:</strong> Choose your preferences from a total of nine news categories.
+          </li>
+          <li>
+            <strong>Step 3:</strong> Review two different versions of a news article summary and select your preferred version. Repeat this step <strong>five times</strong>.
+          </li>
+          <li>
+            <strong>Step 4:</strong> Answer questions about each of your choices and the news categories from which you reviewed summaries.
+          </li>
+        </ul>
+      </div>
+
+      <p>
+        The article summaries used in this study are collected from a selection of the most-read U.S.-based outlets and categories.
+      </p>
+
+      <h2>Additional Information about the Study</h2>
+
+      <p>
+        Your participation is voluntary, and all responses are confidential and processed anonymously. The entire process takes about 13 minutes.
+        Thank you for your contribution!
+      </p>
+
+      {% if session.transparency == "transparent" %}
+         <p>
+            <strong>Please note that the satirical summaries of the news articles were generated with the assistance of an artificial intelligence language model, such as ChatGPT.🚨</strong>
+         </p>
+      {% endif %}
+    </div>
+
+    <!-- Call To Action Section -->
+    <div class="cta-section">
+      <h2>Are you ready?🚀</h2>
+      <a class="cta-button" href="{{ url_for('pre_questionnaire') }}">Start</a>
+    </div>
+    
+    <!-- Consent Note -->
+    <div class="consent-note">
+      <p>By clicking the "Start" button, you confirm that you have read and approved this consent form.</p>
+    </div>
+  </div>
+</body>
+</html>

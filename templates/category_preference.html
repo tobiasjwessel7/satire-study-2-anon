@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Preference Selection</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Full-width background container */
+    .full-container {
+      width: 100%;
+      background-color: #f9f9f9;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    
+    /* Container that scales perfectly around the content */
+    .inner-container {
+      margin: auto;
+      padding: 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+    
+    .header {
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0;
+    }
+    
+    .header p {
+      margin: 10px 0 20px;
+    }
+    
+    /* Grid container for cards */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      justify-content: center;
+    }
+    
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media screen and (max-width: 480px) {
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .category-card {
+      text-align: center;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 300px;  /* Prevent card from scaling too much */
+      width: 100%;
+      margin: auto;
+    }
+    
+    .category-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    
+    .category-name {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #555;
+    }
+    
+    /* Likert scale radio options */
+    .likert-scale {
+      margin-top: 15px;
+    }
+    
+    .likert-scale label {
+      font-size: 0.9rem;
+      color: #777;
+    }
+    
+    .likert-options {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    
+    .likert-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .likert-option input[type="radio"] {
+      display: none;
+    }
+    
+    .likert-option span {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 50%;
+      border: 2px solid #007BFF;
+      text-align: center;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    
+    .likert-option input[type="radio"]:checked + span {
+      background-color: #007BFF;
+      color: white;
+    }
+    
+    .current-value {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #007BFF;
+      font-weight: bold;
+    }
+    
+    .submit-button {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .submit-button button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    .submit-button button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="full-container">
+    <div class="inner-container">
+      <div class="header">
+        <h1>Select Your Preferences</h1>
+        <p>Rate each category based on your interest.</p>
+        <p> 1 = No interest | 4 = Neutral | 7 = High Interest</p>
+      </div>
+      
+      <form action="/category-preference" method="POST" onsubmit="return validateForm();">
+        <div class="categories-grid">
+          {% for category in categories %}
+          <div class="category-card">
+            <img src="{{ url_for('static', filename='images/' + category.lower() + '.jpg') }}" alt="{{ category }} Image">
+            <div class="category-name">{{ category }}</div>
+            <div class="likert-scale">
+              <label for="{{ category }}">Interest Level:</label>
+              <div class="likert-options">
+                {% for i in range(1, 8) %}
+                <label class="likert-option">
+                  <input 
+                    type="radio" 
+                    name="{{ category }}" 
+                    value="{{ i }}" 
+                    onclick="updateValue('{{ category }}-value', this.value)">
+                  <span>{{ i }}</span>
+                </label>
+                {% endfor %}
+              </div>
+              <!-- Display the chosen description; initially prompt the user -->
+              <div id="{{ category }}-value" class="current-value">Please select an option</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="submit-button">
+          <button type="submit">Submit Preferences</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    const likertDescriptions = {
+      1: "No interest",
+      2: "Dislike",
+      3: "Slightly Dislike",
+      4: "Neutral",
+      5: "Slightly Like",
+      6: "Like",
+      7: "High interest"
+    };
+
+    function updateValue(elementId, value) {
+      const description = likertDescriptions[value] || value;
+      document.getElementById(elementId).textContent = description;
+    }
+
+    function validateForm() {
+      const categoryCards = document.querySelectorAll('.category-card');
+      for (let card of categoryCards) {
+        const radios = card.querySelectorAll('input[type="radio"]');
+        let isChecked = false;
+        for (let radio of radios) {
+          if (radio.checked) {
+            isChecked = true;
+            break;
+          }
+        }
+        if (!isChecked) {
+          alert('Please select a preference for all categories.');
+          return false;
+        }
+      }
+      return true;
+    }
+  </script>
+</body>
+</html>
+
